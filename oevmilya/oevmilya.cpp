@@ -236,7 +236,7 @@ void runningstring(int value)
 	short direction;
 	string str1 = "", str2 = "";
 	HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	std::cout << "select direction:\n1. top left->right\n2. top right->left\n3. bottom left->right\n4. bottom right->left\n";
+	std::cout << "select direction:\n1. left -> right\n2. left <- right\n3. top -> down\n4. spiral\n";
 	cin >> direction;
 	std::cout << "select speed:\n1. slow\n2. medium\n3. fast\n";
 	cin >> speed;
@@ -253,41 +253,35 @@ void runningstring(int value)
 		str1 += to_string(x);
 	}
 
-	system("mode con cols=35 lines=5");
 	CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
 	GetConsoleScreenBufferInfo(hStdOut, &consoleInfo);
 	int width = consoleInfo.srWindow.Right - consoleInfo.srWindow.Left + 1;
 	int height = consoleInfo.srWindow.Bottom - consoleInfo.srWindow.Top + 1;
 
 	COORD pos;
-	
+
 	if (direction == 1)
 	{
-		str2 = "";
-		pos.X = 0;
-		pos.Y = 0;
-		int i = str1.size();
-		while (1)
+		while (!_kbhit())
 		{
-			while (!_kbhit() && i > 0)
+			str2 = "";
+			pos.X = 0;
+			pos.Y = 0;
+			int i = str1.size();
+			while (!_kbhit())
 			{
-				string temp = str2;
-				str2 = "";
-				str2 += str1[i];
-				str2 += temp;
-				std::cout << str2;
-				Sleep(speed);
-				system("cls");
-				i--;
-			}
-			pos.X++;
-			if (pos.X == width)
-			{
-				pos.X = 0;
-				pos.Y++;
-			}
-			if (pos.Y+1 == height)
-			{
+				while (!_kbhit() && i > 0)
+				{
+					string temp = str2;
+					str2 = "";
+					str2 += str1[i];
+					str2 += temp;
+					std::cout << str2;
+					Sleep(speed);
+					system("cls");
+					i--;
+				}
+				pos.X++;
 				if (pos.X + str2.size() == width)
 				{
 					while (!_kbhit() && str2.size() != 0)
@@ -301,132 +295,105 @@ void runningstring(int value)
 					}
 					break;
 				}
+				SetConsoleCursorPosition(hStdOut, pos);
+				std::cout << str1;
+				Sleep(speed);
+				system("cls");
 			}
-			SetConsoleCursorPosition(hStdOut, pos);
-			std::cout << str1;
-			Sleep(speed);
-			system("cls");
 		}
 	}
 	else if (direction == 2)
 	{
-		str2 = "";
-		pos.X = width-1;
-		pos.Y = 0;
-		int i = 0;
-		while (1)
+		while (!_kbhit())
 		{
-			while (!_kbhit() && i < str1.size())
+			str2 = "";
+			pos.X = width - 1;
+			pos.Y = 0;
+			int i = 0;
+			while (!_kbhit())
 			{
-				SetConsoleCursorPosition(hStdOut, pos);
-				str2 += str1[i];
-				std::cout << str2;
-				Sleep(speed);
-				system("cls");
-				i++;
-				pos.X--;
-			}
-			pos.X--;
-			if (pos.X == 0)
-			{
-				while (1)
+				while (!_kbhit() && i < str1.size())
 				{
-					string str3 = "";
-					short j = 0;
-					str3.push_back(str2[j]);
-					string temp = "";
-					for (short k = j + 1; k < str2.size(); k++)
-					{
-						temp += str2[k];
-					}
-					str2 = temp;
-					system("cls");
-					Sleep(speed);
-					std::cout << str2;
-					pos.X = width;
-					pos.Y++;
 					SetConsoleCursorPosition(hStdOut, pos);
-					std::cout << str3;
-					j++;
-					if (j == str2.size()) break;
+					str2 += str1[i];
+					std::cout << str2;
+					Sleep(speed);
+					system("cls");
+					i++;
+					pos.X--;
 				}
-			}
-			if (pos.Y + 1 == height)
-			{
-				if (pos.X + str2.size() == 0)
+				pos.X--;
+				if (pos.X == 0)
 				{
-					while (!_kbhit() && str2.size() != 0)
+					while (!str2.empty())
 					{
-						pos.X++;
-						SetConsoleCursorPosition(hStdOut, pos);
-						str2.pop_back();
-						std::cout << str2;
-						Sleep(speed);
+						string str3 = "";
+						short j = 0;
+						str3.push_back(str2[j]);
+						string temp = "";
+						for (short k = j + 1; k < str2.size(); k++)
+						{
+							temp += str2[k];
+						}
+						str2 = temp;
 						system("cls");
+						Sleep(speed);
+						std::cout << str2;
 					}
 					break;
 				}
+
+				SetConsoleCursorPosition(hStdOut, pos);
+				std::cout << str1;
+				Sleep(speed);
+				system("cls");
 			}
-			SetConsoleCursorPosition(hStdOut, pos);
-			std::cout << str1;
-			Sleep(speed);
-			system("cls");
 		}
 	}
 	else if (direction == 3)
 	{
-		pos.X = width;
-		pos.Y = height;
-		int i = 0;
-		while (i < str1.size() && !_kbhit())
+		pos.X = 0;
+		pos.Y = 0;
+		while (!_kbhit())
 		{
 			SetConsoleCursorPosition(hStdOut, pos);
-			str2 += str1[i];
-			std::cout << str2;
+			cout << str1;
 			Sleep(speed);
 			system("cls");
-			i++;
-		}
-		pos.X++;
-		if (pos.X == width)
-		{
-			pos.X = 0;
 			pos.Y++;
-			str2 = "";
-			
+			if (pos.Y == height) pos.Y = 0;
 		}
-		SetConsoleCursorPosition(hStdOut, pos);
-		std::cout << str1;
-		Sleep(speed);
-		system("cls");
 	}
 	else if (direction == 4)
 	{
-		int i = 0;
-		pos.X = width;
-		pos.Y = height;
-		while (i < str1.size() && !_kbhit())
+		while (!_kbhit())
 		{
-			SetConsoleCursorPosition(hStdOut, pos);
-			str2 += str1[i];
-			std::cout << str2;
-			Sleep(speed);
-			system("cls");
-			i++;
-		}
-		pos.X++;
-		if (pos.X == width)
-		{
+			str2 = str1;
 			pos.X = 0;
-			pos.Y++;
-			str2 = "";
-		
+			pos.Y = 0;
+			while (!_kbhit())
+			{
+				SetConsoleCursorPosition(hStdOut, pos);
+				cout << str2;
+				Sleep(speed);
+				system("cls");
+				pos.Y++;
+				pos.X++;
+				if (pos.Y == height) pos.Y = 0;
+				if (pos.X + str2.size() == width)
+				{
+					if (!str2.empty()) str2.pop_back();
+				}
+				if (str2.empty()) break;
+			}
 		}
-		SetConsoleCursorPosition(hStdOut, pos);
-		std::cout << str1;
-		Sleep(speed);
-		system("cls");
 	}
+}
+
+void runningstring(float value)
+{
+	int* temp = (int*)&value;
+	runningstring(*temp);
 }
 
 int main()
@@ -550,6 +517,7 @@ int main()
 				output(inverteddata);
 				std::cout << endl << endl;
 			}
+			runningstring(inverteddata);
 		}
 	} while (menu != '0');
 }
